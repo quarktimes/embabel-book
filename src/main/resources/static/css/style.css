@@ -1,0 +1,163 @@
+/* ═══════════════════════════════════════════
+   Embabel 智能图书借阅 — 自定义样式
+   ═══════════════════════════════════════════ */
+
+/* ─── 基础 ─── */
+body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* ─── 渐变标题 ─── */
+.gradient-text {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+/* ─── 图书卡片 ─── */
+.book-card {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+}
+
+.book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 可借状态条 */
+.border-start.border-success.border-4 {
+    border-left-color: #20c997 !important;
+}
+
+/* 已借状态条 */
+.border-start.border-secondary.border-4 {
+    border-left-color: #adb5bd !important;
+}
+
+/* ─── 搜索框 ─── */
+#query {
+    border-radius: 12px 0 0 12px;
+    font-size: 1.1rem;
+    padding-left: 0.5rem;
+}
+
+#query:focus {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.input-group > .btn {
+    border-radius: 0 12px 12px 0;
+}
+
+/* ─── 结果弹窗 ─── */
+#result-area {
+    animation: slideDown 0.3s ease-out;
+}
+
+#result-area .alert {
+    border-radius: 12px;
+    border: none;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── 搜索建议点击 ─── */
+.badge[onclick] {
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.badge[onclick]:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+/* ─── 借阅历史 ─── */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+/* ─── 响应式 ─── */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .display-6 {
+        font-size: 1.5rem;
+    }
+
+    .input-group-lg .form-control,
+    .input-group-lg .btn {
+        font-size: 0.95rem;
+    }
+
+    .badge[onclick] {
+        font-size: 0.75rem;
+    }
+}
+
+/* ─── 滚动条优化 ─── */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/* ─── htmx 加载指示 ─── */
+.htmx-request {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.htmx-request .btn {
+    position: relative;
+}
+
+.htmx-request .btn::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: calc(50% - 8px);
+    right: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

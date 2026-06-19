@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 图书列表片段                                -->
+<!-- ════════════════════════════════════════════ -->
+<div th:fragment="bookList" id="book-list">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-collection me-1"></i>图书列表
+        </h5>
+        <span class="badge bg-secondary rounded-pill" th:text="${#lists.size(books)} + '本'">0本</span>
+    </div>
+
+    <div class="row g-3" th:if="${!#lists.isEmpty(books)}">
+        <div class="col-md-6" th:each="book : ${books}">
+            <div class="card h-100 border-0 shadow-sm book-card"
+                 th:classappend="${book.available()} ? 'border-start border-success border-4' : 'border-start border-secondary border-4'">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="fw-bold mb-1" th:text="${book.title()}">书名</h6>
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-pencil-fill"></i>
+                                <span th:text="${book.author()}">作者</span>
+                            </p>
+                        </div>
+                        <span class="badge rounded-pill"
+                              th:classappend="${book.available()} ? 'bg-success' : 'bg-secondary'"
+                              th:text="${book.available()} ? '✅ 可借' : '❌ 已借出'">
+                        </span>
+                    </div>
+                    <div>
+                        <span class="badge bg-light text-dark me-1">
+                            <i class="bi bi-tag-fill me-1"></i><span th:text="${book.category()}">分类</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(books)}" class="text-center text-muted py-5">
+        <i class="bi bi-emoji-frown fs-1"></i>
+        <p class="mt-2">暂无图书</p>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 借阅历史片段                                -->
+<!-- ════════════════════════════════════════════ -->
+<div th:fragment="history" id="history-list">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-clock-history me-1"></i>借阅记录
+        </h5>
+    </div>
+
+    <div class="card border-0 shadow-sm" th:if="${!#lists.isEmpty(borrowRecords)}">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center py-3"
+                th:each="record : ${borrowRecords}">
+                <div>
+                    <span class="fw-semibold" th:text="${record.book.title}">书名</span>
+                    <br>
+                    <small class="text-muted" th:text="${record.book.author}">作者</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-success bg-opacity-10 text-success"
+                          th:if="${record.returnTime == null}">
+                        <i class="bi bi-bookmark-check"></i> 借阅中
+                    </span>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary"
+                          th:if="${record.returnTime != null}">
+                        <i class="bi bi-bookmark-check-fill"></i> 已归还
+                    </span>
+                    <br>
+                    <small class="text-muted"
+                           th:text="${#temporals.format(record.borrowTime, 'MM-dd HH:mm')}">时间</small>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div th:if="${#lists.isEmpty(borrowRecords)}" class="text-center text-muted py-4">
+        <i class="bi bi-journal-text fs-1"></i>
+        <p class="mt-2 mb-0 small">暂无借阅记录</p>
+        <p class="small">快去借本书吧 📖</p>
+    </div>
+</div>
+</body>
+</html>

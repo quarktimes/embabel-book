@@ -1,0 +1,6 @@
+- [模板引擎选择](memory/template-engine-choice.md) — Thymeleaf+htmx 而非 Vue 3
+- [DeepSeek 集成](memory/deepseek-integration.md) — API 方案及无 Key 降级
+- [Cost 设计原则](memory/ooda-cost-design.md) — Action cost 分级依据
+- [Embabel 注解规范](memory/embabel-annotations.md) — @Action/@Condition/@AchievesGoal 用法
+- [演示数据设计](memory/demo-data-design.md) — 10 本书 + 2 个用户的预置数据
+- [OODA 动态性验证](memory/ooda-dynamic-behavior.md) — 4 个动态场景及验证方案

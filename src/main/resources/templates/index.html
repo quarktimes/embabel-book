@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>📚 Embabel 智能图书借阅</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container py-4">
+
+    <!-- ═══ 顶栏 ═══ -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-0">
+                <span class="gradient-text">Embabel</span>
+                <span class="text-muted fs-4">智能图书借阅</span>
+            </h1>
+            <p class="text-muted small mb-0 mt-1">
+                <i class="bi bi-arrow-repeat me-1"></i>
+                OODA 循环驱动 · 自然语言借书
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-person-circle fs-4 text-primary"></i>
+            <select id="userSelect" name="userId" class="form-select form-select-sm" style="width: auto;">
+                <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.name}"></option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ═══ 搜索区 ═══ -->
+    <div class="card border-0 shadow-sm mb-4 bg-primary bg-gradient text-white">
+        <div class="card-body p-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white border-0">
+                    <i class="bi bi-search text-primary"></i>
+                </span>
+                <input type="text" id="query" name="query"
+                       class="form-control border-0 shadow-none"
+                       placeholder="试试说：我想借一些科幻小说"
+                       autofocus
+                       hx-post="/borrow"
+                       hx-trigger="keydown[key=='Enter']"
+                       hx-target="#result-area"
+                       hx-include="#userSelect"
+                       hx-swap="innerHTML">
+                <button class="btn btn-light text-primary fw-bold px-4"
+                        hx-post="/borrow"
+                        hx-target="#result-area"
+                        hx-include="#userSelect, #query"
+                        hx-swap="innerHTML">
+                    <i class="bi bi-book me-1"></i>借书
+                </button>
+            </div>
+            <div class="mt-2 d-flex gap-2 flex-wrap">
+                <span class="badge bg-white text-primary opacity-75">💡 试试说：</span>
+                <span class="badge bg-light text-dark opacity-75"
+                      style="cursor:pointer"
+                      onclick="document.getElementById('query').value='我想借科幻小说'; this.closest('.card-body').querySelector('button').click()">
+                    我想借科幻小说
+                </span>
+                <span class="badge bg-light text-dark opacity-75"
+                      style="cursor:pointer"
+                      onclick="document.getElementById('query').value='有没有东野圭吾的书'; this.closest('.card-body').querySelector('button').click()">
+                    有没有东野圭吾的书
+                </span>
+                <span class="badge bg-light text-dark opacity-75"
+                      style="cursor:pointer"
+                      onclick="document.getElementById('query').value='推荐机器学习的书'; this.closest('.card-body').querySelector('button').click()">
+                    推荐机器学习的书
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ 结果弹窗 ═══ -->
+    <div id="result-area"></div>
+
+    <!-- ═══ 主内容：图书列表 + 借阅历史 ═══ -->
+    <div class="row g-4">
+        <div class="col-lg-8" th:replace="fragments/bookList :: bookList">
+        </div>
+        <div class="col-lg-4" th:replace="fragments/bookList :: history">
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

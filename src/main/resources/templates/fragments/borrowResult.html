@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 借书结果弹窗                                 -->
+<!-- 使用 hx-swap-oob 同时刷新三个区域：          -->
+<!-- 1. #result-area   → 结果弹窗                -->
+<!-- 2. #book-list     → 图书列表                -->
+<!-- 3. #history-list  → 借阅历史                -->
+<!-- ════════════════════════════════════════════ -->
+
+<!-- 结果弹窗 -->
+<div th:fragment="borrowResult">
+    <div id="result-area"
+         th:classappend="${message.contains('成功')} ? 'alert alert-success alert-dismissible fade show' : 'alert alert-info alert-dismissible fade show'"
+         role="alert">
+        <div class="d-flex align-items-center">
+            <i class="bi fs-4 me-2"
+               th:classappend="${message.contains('成功')} ? 'bi-check-circle-fill' : 'bi-info-circle-fill'"></i>
+            <span th:text="${message}">结果</span>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- 同步刷新图书列表 -->
+    <div th:replace="fragments/bookList :: bookList" hx-swap-oob="true"></div>
+
+    <!-- 同步刷新借阅历史 -->
+    <div th:replace="fragments/bookList :: history" hx-swap-oob="true"></div>
+</div>
+</body>
+</html>
