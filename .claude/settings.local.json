@@ -77,7 +77,10 @@
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.ProcessOptions)",
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar 'com.embabel.agent.core.ProcessOptions$Companion')",
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.Blackboard)",
-      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar 'com.embabel.agent.core.Blackboard')"
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar 'com.embabel.agent.core.Blackboard')",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.api.annotation.Agent)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.Agent)",
+      "Bash(DEEPSEEK_API_KEY=sk-test mvn test -Dtest=\"com.example.library.agent.LibraryAgentIntegrationTest#全链路_成功借阅\")"
     ],
     "additionalDirectories": [
       "/Users/dehualiu/.claude/projects/-Users-dehualiu-Documents-project-aiproject-embabel-book"

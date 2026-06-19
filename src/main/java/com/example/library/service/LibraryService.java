@@ -16,7 +16,6 @@ import java.util.List;
 
 /**
  * 图书借阅的视图层服务。
- * 负责组装 Controller 需要的所有视图数据，隐藏 Repository 细节。
  */
 @Service
 public class LibraryService {
