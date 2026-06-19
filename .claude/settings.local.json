@@ -70,7 +70,11 @@
       "Bash(javap -classpath . com.embabel.agent.autoconfigure.models.deepseek.AgentDeepSeekAutoConfiguration)",
       "Bash(mvn dependency:resolve -DincludeGroupIds=com.embabel.agent -DremoteRepositories=https://repo.maven.apache.org/maven2)",
       "Bash(curl -s \"https://repo1.maven.org/maven2/com/embabel/agent/embabel-agent-starter-deepseek/maven-metadata.xml\")",
-      "Bash(javap -c -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-deepseek-autoconfigure/0.3.5/embabel-agent-deepseek-autoconfigure-0.3.5.jar com.embabel.agent.autoconfigure.models.deepseek.AgentDeepSeekAutoConfiguration)"
+      "Bash(javap -c -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-deepseek-autoconfigure/0.3.5/embabel-agent-deepseek-autoconfigure-0.3.5.jar com.embabel.agent.autoconfigure.models.deepseek.AgentDeepSeekAutoConfiguration)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.AgentPlatform)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.AgentProcess)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-platform-autoconfigure/0.3.5/embabel-agent-platform-autoconfigure-0.3.5.jar com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.ProcessOptions)"
     ],
     "additionalDirectories": [
       "/Users/dehualiu/.claude/projects/-Users-dehualiu-Documents-project-aiproject-embabel-book"

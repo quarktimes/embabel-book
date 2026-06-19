@@ -1,40 +1,37 @@
 package com.example.library.agent;
 
+import com.embabel.agent.api.annotation.AchievesGoal;
+import com.embabel.agent.api.annotation.Action;
 import com.embabel.agent.api.annotation.Agent;
 import com.embabel.agent.api.annotation.Condition;
-import com.example.library.action.CheckAvailabilityAction;
-import com.example.library.action.ExecuteBorrowAction;
-import com.example.library.action.FilterBorrowedBooksAction;
-import com.example.library.action.ParseQueryAction;
-import com.example.library.action.ReturnResultAction;
-import com.example.library.action.SearchBooksAction;
+import com.embabel.agent.api.common.Ai;
+import com.embabel.common.ai.model.LlmOptions;
 import com.example.library.domain.Book;
 import com.example.library.domain.BorrowRequest;
 import com.example.library.domain.BorrowResult;
 import com.example.library.domain.ParsedQuery;
 import com.example.library.domain.User;
+import com.example.library.repository.BookRepository;
+import com.example.library.repository.BorrowRecordRepository;
 import com.example.library.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
+import com.example.library.entity.BorrowRecordEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * Embabel 智能图书借阅 Agent。
  * <p>
- * 使用 Embabel 注解标记完整的 OODA 结构：
- * <ul>
- *   <li>{@code @Agent} — 声明 Agent</li>
- *   <li>{@code @Action} — OODA 步骤，{@code pre} 引用 Condition</li>
- *   <li>{@code @Condition} — 守卫条件，Embabel 框架自动评估</li>
- *   <li>{@code @AchievesGoal} — 标记目标达成</li>
- * </ul>
+ * 所有 OODA 步骤通过 @Action 注解标记，Conditions 由
+ * Embabel GOAP 规划器自动评估，不再需要 if/else 手动编排。
  * <p>
- * 当前为手动编排模式。当 AgentPlatformAutoConfiguration 启用后，
- * Embabel 的 GOAP 规划器会根据 {@code @Action(pre = "条件名")}
- * 和数据流类型自动编排执行顺序，不再需要 {@code execute()} 方法。
+ * LibraryService 通过 AgentPlatform API 执行 Agent，
+ * 框架自动按数据流 + Conditions 规划执行顺序。
  */
 @Component
 @Agent(
@@ -47,28 +44,82 @@ public class LibraryAgent {
     private static final Logger log = LoggerFactory.getLogger(LibraryAgent.class);
 
     @Autowired
-    private ParseQueryAction parseQueryAction;
+    private Ai ai;
 
     @Autowired
-    private SearchBooksAction searchBooksAction;
-
-    @Autowired
-    private CheckAvailabilityAction checkAvailabilityAction;
-
-    @Autowired
-    private FilterBorrowedBooksAction filterBorrowedBooksAction;
-
-    @Autowired
-    private ExecuteBorrowAction executeBorrowAction;
-
-    @Autowired
-    private ReturnResultAction returnResultAction;
+    private BookRepository bookRepository;
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BorrowRecordRepository borrowRecordRepository;
+
     // ════════════════════════════════════════════
-    // Conditions — 由 Embabel 规划器自动评估
+    // Actions — 每个步骤用 @Action 标记，Conditions 由 Embabel 评估
+    // ════════════════════════════════════════════
+
+    @Action(cost = 5, description = "检查并解析用户查询",
+            pre = "hasValidQuery")
+    public ParsedQuery parseQuery(BorrowRequest request) {
+        log.info("action=parseQuery request={}", request.query());
+        var llm = LlmOptions.withModel("deepseek-chat").withTemperature(0.1);
+        return ai.withLlm(llm)
+                .withSystemPrompt("""
+                        将用户的自然语言查询解析为结构化信息。
+                        返回 JSON：{category, keyword, author}，null 表示无。
+                        示例：「我想借科幻小说」→ {"category":"科幻","keyword":null,"author":null}
+                        """)
+                .creating(ParsedQuery.class)
+                .fromPrompt(request.query());
+    }
+
+    @Action(cost = 2, description = "按分类/作者/关键词搜索图书")
+    public List<Book> searchBooks(ParsedQuery parsed) {
+        log.info("action=searchBooks parsed={}", parsed);
+        if (parsed.category() != null)
+            return bookRepository.findByCategoryContaining(parsed.category()).stream().map(e -> e.toDomain()).toList();
+        if (parsed.author() != null)
+            return bookRepository.findByAuthorContaining(parsed.author()).stream().map(e -> e.toDomain()).toList();
+        if (parsed.keyword() != null)
+            return bookRepository.findByTitleContaining(parsed.keyword()).stream().map(e -> e.toDomain()).toList();
+        return List.of();
+    }
+
+    @Action(cost = 0, description = "实时检查图书可借状态")
+    public List<Book> checkAvailable(List<Book> books) {
+        log.info("action=checkAvailable input={}", books.size());
+        return books.stream()
+                .filter(b -> bookRepository.findById(b.id()).map(e -> e.isAvailable()).orElse(false))
+                .toList();
+    }
+
+    @Action(cost = 0, description = "过滤用户已借过的图书")
+    public List<Book> filterBorrowed(List<Book> books, User user) {
+        log.info("action=filterBorrowed input={}", books.size());
+        return books.stream()
+                .filter(b -> !user.borrowedBookIds().contains(b.id()))
+                .toList();
+    }
+
+    @Transactional
+    @Action(cost = 1, description = "执行借书操作")
+    @AchievesGoal(description = "用户成功借到图书", value = 1.0)
+    public BorrowResult borrowBook(Book book, User user) {
+        log.info("action=borrowBook book={} user={}", book.id(), user.id());
+        var bookEntity = bookRepository.findById(book.id())
+                .orElseThrow(() -> new IllegalArgumentException("图书不存在: " + book.id()));
+        if (!bookEntity.isAvailable())
+            throw new IllegalStateException("图书已被借出: " + book.title());
+        bookEntity.setAvailable(false);
+        bookRepository.save(bookEntity);
+        var userEntity = userRepository.findById(user.id()).orElseThrow();
+        borrowRecordRepository.save(new BorrowRecordEntity(userEntity, bookEntity, LocalDateTime.now()));
+        return new BorrowResult(true, "成功借阅《" + book.title() + "》(" + book.author() + ")", book);
+    }
+
+    // ════════════════════════════════════════════
+    // Conditions — 给 Embabel 规划器用
     // ════════════════════════════════════════════
 
     @Condition(name = "hasValidQuery", cost = 0)
@@ -76,86 +127,42 @@ public class LibraryAgent {
         return request != null && request.query() != null && !request.query().isBlank();
     }
 
-    @Condition(name = "matchFound", cost = 0)
-    public boolean matchFound(List<Book> books) {
-        return books != null && !books.isEmpty();
-    }
-
-    @Condition(name = "availableExists", cost = 0)
-    public boolean availableExists(List<Book> books) {
-        return books != null && !books.isEmpty();
-    }
-
-    @Condition(name = "unborrowedExists", cost = 0)
-    public boolean unborrowedExists(List<Book> books) {
+    @Condition(name = "hasBooks", cost = 0)
+    public boolean hasBooks(List<Book> books) {
         return books != null && !books.isEmpty();
     }
 
     // ════════════════════════════════════════════
-    // OODA 循环 — 手动编排（平台启用后由 GOAP 接管）
+    // 手动编排 — 平台完全就绪后可移除
     // ════════════════════════════════════════════
 
-    /**
-     * 执行一次完整的 OODA 循环。
-     * <p>
-     * 当前为手动编排。各 Condition 由 {@code @Condition} 注解标记，
-     * Action 由 {@code @Action} 注解标记。
-     * 当 AgentPlatform 启用后，此方法可由框架自动生成，
-     * 通过 {@code @Action(pre = "conditionName")} + 数据流推断。
-     */
     public String execute(BorrowRequest request) {
-        log.info("=== OODA Loop Start ===");
+        log.info("=== OODA Loop ===");
 
-        // ═══ [Observe] ═══
-        log.info("[Observe] request user={} query={}", request.userId(), request.query());
+        if (!hasValidQuery(request))
+            return "请描述您想借什么样的书，比如「我想借科幻小说」";
 
-        // ═══ [Orient] ═══
-        if (!hasValidQuery(request)) {
-            return "请描述您想借什么样的书，比如「我想借科幻小说」或「有没有东野圭吾的书」";
-        }
+        var parsed = parseQuery(request);
+        var allBooks = searchBooks(parsed);
+        if (!hasBooks(allBooks))
+            return "抱歉，没有找到" + describe(parsed) + "的图书";
 
-        ParsedQuery parsed = parseQueryAction.execute(request);
-        log.info("[Orient] parsed={}", parsed);
+        var available = checkAvailable(allBooks);
+        if (!hasBooks(available))
+            return "找到的图书目前都已被借出";
 
-        // ═══ [Decide] ═══
-        List<Book> allBooks = searchBooksAction.execute(parsed);
-        if (!matchFound(allBooks)) {
-            return "抱歉，没有找到" + describeQuery(parsed) + "的图书";
-        }
-        log.info("[Decide] searchBooks={}", allBooks.size());
+        var user = userRepository.findById(request.userId()).map(e -> e.toDomain()).orElse(null);
+        if (user == null) return "用户不存在";
 
-        List<Book> available = checkAvailabilityAction.execute(allBooks);
-        if (!availableExists(available)) {
-            return "找到的图书目前都已被借出，请稍后再来或换个分类试试";
-        }
-        log.info("[Decide] available={}", available.size());
+        var candidates = filterBorrowed(available, user);
+        if (!hasBooks(candidates))
+            return "这些书您都已经借过了";
 
-        User user = userRepository.findById(request.userId())
-                .map(e -> e.toDomain())
-                .orElse(null);
-        if (user == null) {
-            return "用户不存在";
-        }
-
-        List<Book> candidates = filterBorrowedBooksAction.execute(available, user);
-        if (!unborrowedExists(candidates)) {
-            return "这些书您都已经借过了，推荐看看其他分类吧";
-        }
-        log.info("[Decide] candidates={}", candidates.size());
-
-        Book selected = candidates.getFirst();
-        log.info("[Decide] selected={}", selected.title());
-
-        // ═══ [Act] ═══
-        BorrowResult result = executeBorrowAction.execute(selected, user);
-        String message = returnResultAction.execute(result);
-
-        log.info("[Act] result={}", message);
-        log.info("=== OODA Loop End ===");
-        return message;
+        var result = borrowBook(candidates.getFirst(), user);
+        return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
     }
 
-    private String describeQuery(ParsedQuery q) {
+    private String describe(ParsedQuery q) {
         if (q.category() != null) return q.category() + "类";
         if (q.author() != null) return q.author() + "的作品";
         if (q.keyword() != null) return "关于「" + q.keyword() + "」";
