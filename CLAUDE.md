@@ -46,7 +46,8 @@
     │   ├── UserRepository.java
     │   └── BorrowRecordRepository.java
     ├── service/
-    │   └── DeepSeekService.java         # DeepSeek API 调用封装
+    │   ├── DeepSeekService.java         # DeepSeek API 调用封装
+    │   └── LibraryService.java          # 视图层服务，组装 Controller 需要的数据
     └── config/
         └── DemoDataLoader.java          # 预置演示数据
 ```
@@ -76,9 +77,23 @@ Observe → Orient(ParseQuery) → Decide(SearchBooks → CheckAvailable → Fil
 - 使用 JPA 注解
 - 包含 `toDomain()` 方法转领域对象
 
+### 分层依赖规则（重要）
+各层只能依赖紧邻的下一层，不可跨层调用：
+
+```
+Controller → LibraryService → LibraryAgent → Action/Repository
+  ↑ HTTP/视图           ↑ 数据组装        ↑ OODA 编排     ↑ 原子操作
+```
+
+- **Controller**：只注入 `LibraryService`，不注入任何 Repository、Agent 或 Action
+- **Service**：组装视图数据（图书列表、用户列表、借阅历史），调用 Agent
+- **Agent**：编排 OODA 循环，调用 Action 和 Repository
+- **Action**：注入 Condition 和 Repository，实现单个业务步骤
+
 ### Controller 规范
 - 使用 `@Controller`（非 `@RestController`），返回模板视图
 - 借书接口：`POST /borrow`，返回 HTML 片段（htmx）
+- **禁止**在 Controller 中注入 Repository、EntityManager、Action
 
 ## 测试规范
 - 测试框架：JUnit 5 + Mockito
