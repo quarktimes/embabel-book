@@ -77,6 +77,16 @@ Observe → Orient(ParseQuery) → Decide(SearchBooks → CheckAvailable → Fil
 - 使用 JPA 注解
 - 包含 `toDomain()` 方法转领域对象
 
+### Embabel 注解规范
+Agent 和 OODA 组件使用 Embabel 官方注解（`com.embabel.agent.api.annotation`）：
+
+| 注解 | 位置 | 用途 |
+|------|------|------|
+| `@Agent` | 类 | 声明这是一个 Agent |
+| `@Action(cost=N, description="...")` | 方法 | 标记 OODA 步骤 |
+| `@Condition(name="...", cost=N)` | 方法 | 守卫条件，框架自动评估 |
+| `@AchievesGoal(description="...", value=N)` | 方法 | 标记目标达成 |
+
 ### 分层依赖规则（重要）
 各层只能依赖紧邻的下一层，不可跨层调用：
 
@@ -87,8 +97,16 @@ Controller → LibraryService → LibraryAgent → Action/Repository
 
 - **Controller**：只注入 `LibraryService`，不注入任何 Repository、Agent 或 Action
 - **Service**：组装视图数据（图书列表、用户列表、借阅历史），调用 Agent
-- **Agent**：编排 OODA 循环，调用 Action 和 Repository
-- **Action**：注入 Condition 和 Repository，实现单个业务步骤
+- **Agent**：`@Agent` 注解，编排 OODA 循环，条件使用 `@Condition` 标记
+- **Action**：`@Action` 注解，注入 Condition 和 Repository，实现单个业务步骤
+
+### 平台启用说明
+当前 `AgentPlatformAutoConfiguration` 被排除（见 application.yml），
+OODA 循环由 `LibraryAgent.execute()` 手动编排。
+要启用 Embabel 的 GOAP 自动规划：
+1. 移除 `spring.autoconfigure.exclude` 配置
+2. 配置 LLM（如 OpenAI API Key）
+3. 重启应用
 
 ### Controller 规范
 - 使用 `@Controller`（非 `@RestController`），返回模板视图

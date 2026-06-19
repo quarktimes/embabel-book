@@ -37,7 +37,23 @@
       "Bash(git commit -m 'refactor: 使用 Embabel 官方注解替换自定义注解 *)",
       "Bash(git push *)",
       "WebFetch(domain:central.sonatype.com)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.AgentPlatform)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.core.AgentPlatform)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.annotation.Action)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.annotation.Condition)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.annotation.Agent)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.annotation.Goal)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.core.Goal)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.annotation.AchievesGoal)",
+      "Bash(python3 -c ' *)",
+      "Bash(cat META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports)",
+      "Bash(cat META-INF/spring.factories)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-platform-autoconfigure/0.4.0/embabel-agent-platform-autoconfigure-0.4.0.jar com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfigurationFilter)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.spi.config.spring.AgentPlatformConfiguration)",
+      "Bash(javap -verbose -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.spi.config.spring.AgentPlatformConfiguration)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/common/embabel-common-ai/0.1.6/embabel-common-ai-0.1.6.jar com.embabel.common.ai.model.ModelProvider)"
     ],
     "additionalDirectories": [
       "/Users/dehualiu/.claude/projects/-Users-dehualiu-Documents-project-aiproject-embabel-book"
