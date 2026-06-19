@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration
   datasource:
     url: jdbc:h2:mem:library
     driver-class-name: org.h2.Driver

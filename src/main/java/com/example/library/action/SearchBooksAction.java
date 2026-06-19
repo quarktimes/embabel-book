@@ -1,5 +1,6 @@
 package com.example.library.action;
 
+import com.embabel.agent.api.annotation.Action;
 import com.example.library.domain.Book;
 import com.example.library.domain.ParsedQuery;
 import com.example.library.repository.BookRepository;
@@ -22,6 +23,7 @@ public class SearchBooksAction {
      * 按优先级搜索：category → author → keyword。
      * 三者都 null 时返回空列表。
      */
+    @Action(cost = 2, description = "按分类/作者/关键词搜索图书")
     public List<Book> execute(ParsedQuery parsed) {
         if (parsed.category() != null && !parsed.category().isBlank()) {
             log.info("action=SearchBooks cost=2 by=category value={}", parsed.category());

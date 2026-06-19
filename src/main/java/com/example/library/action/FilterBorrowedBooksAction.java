@@ -1,5 +1,6 @@
 package com.example.library.action;
 
+import com.embabel.agent.api.annotation.Action;
 import com.example.library.domain.Book;
 import com.example.library.domain.User;
 import com.example.library.condition.NotBorrowedBeforeCondition;
@@ -21,6 +22,7 @@ public class FilterBorrowedBooksAction {
     /**
      * 过滤掉用户已借过的书。
      */
+    @Action(cost = 0, description = "过滤用户已借过的图书")
     public List<Book> execute(List<Book> books, User user) {
         if (books == null || books.isEmpty()) {
             return List.of();

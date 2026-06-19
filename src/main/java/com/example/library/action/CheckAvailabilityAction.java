@@ -1,5 +1,6 @@
 package com.example.library.action;
 
+import com.embabel.agent.api.annotation.Action;
 import com.example.library.domain.Book;
 import com.example.library.condition.IsAvailableCondition;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class CheckAvailabilityAction {
     /**
      * 过滤出可借的图书（逐本实时检查数据库状态）。
      */
+    @Action(cost = 0, description = "逐本检查图书是否可借（实时读库）")
     public List<Book> execute(List<Book> books) {
         if (books == null || books.isEmpty()) {
             return List.of();

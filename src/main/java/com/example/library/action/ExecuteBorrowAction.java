@@ -1,7 +1,7 @@
 package com.example.library.action;
 
-import com.example.library.annotation.AchievesGoal;
-import com.example.library.annotation.Action;
+import com.embabel.agent.api.annotation.AchievesGoal;
+import com.embabel.agent.api.annotation.Action;
 import com.example.library.domain.Book;
 import com.example.library.domain.BorrowResult;
 import com.example.library.domain.User;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Component
-@AchievesGoal("BORROW_SUCCESS")
 public class ExecuteBorrowAction {
 
     private static final Logger log = LoggerFactory.getLogger(ExecuteBorrowAction.class);
@@ -39,7 +38,8 @@ public class ExecuteBorrowAction {
      * 执行前二次确认图书可借，确保并发安全。
      */
     @Transactional
-    @Action(cost = 1)
+    @Action(cost = 1, description = "执行借书操作，更新图书状态并创建借书记录")
+    @AchievesGoal(description = "用户成功借到图书", value = 1.0)
     public BorrowResult execute(Book book, User user) {
         // 二次确认：重新读库检查 available 状态
         var bookEntity = bookRepository.findById(book.id())

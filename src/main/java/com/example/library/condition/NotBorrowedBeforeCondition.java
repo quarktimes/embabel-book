@@ -1,5 +1,6 @@
 package com.example.library.condition;
 
+import com.embabel.agent.api.annotation.Condition;
 import com.example.library.domain.Book;
 import com.example.library.domain.User;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NotBorrowedBeforeCondition {
 
+    @Condition(name = "NotBorrowedBefore", cost = 0)
     public boolean test(User user, Book book) {
         if (user == null || user.borrowedBookIds() == null) {
             return true;

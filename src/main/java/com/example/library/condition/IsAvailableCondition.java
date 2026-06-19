@@ -1,5 +1,6 @@
 package com.example.library.condition;
 
+import com.embabel.agent.api.annotation.Condition;
 import com.example.library.domain.Book;
 import com.example.library.entity.BookEntity;
 import com.example.library.repository.BookRepository;
@@ -16,6 +17,7 @@ public class IsAvailableCondition {
     @Autowired
     private BookRepository bookRepository;
 
+    @Condition(name = "IsAvailable", cost = 0)
     public boolean test(Book book) {
         return bookRepository.findById(book.id())
                 .map(BookEntity::isAvailable)
