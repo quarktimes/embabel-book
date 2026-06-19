@@ -53,7 +53,24 @@
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-platform-autoconfigure/0.4.0/embabel-agent-platform-autoconfigure-0.4.0.jar com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfigurationFilter)",
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.spi.config.spring.AgentPlatformConfiguration)",
       "Bash(javap -verbose -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.spi.config.spring.AgentPlatformConfiguration)",
-      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/common/embabel-common-ai/0.1.6/embabel-common-ai-0.1.6.jar com.embabel.common.ai.model.ModelProvider)"
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/common/embabel-common-ai/0.1.6/embabel-common-ai-0.1.6.jar com.embabel.common.ai.model.ModelProvider)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.Ai)",
+      "Bash(grep -v \"\\\\$\")",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.common.Ai)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.common.PromptRunner)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar 'com.embabel.agent.api.common.PromptRunner$Creating')",
+      "Bash(mvn dependency:tree)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.common.AiBuilder)",
+      "Bash(find ~/.m2/repository/org/springframework/ai -name \"*.pom\" | head -5)",
+      "Read(//Users/dehualiu/.m2/repository/org/springframework/ai/**)",
+      "Bash(unzip -p /Users/dehualiu/.m2/repository/org/springframework/ai/spring-ai-bom/1.1.5/spring-ai-bom-1.1.5.pom)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/org/springframework/ai/spring-ai-autoconfigure-model-deepseek/1.1.3/spring-ai-autoconfigure-model-deepseek-1.1.3.jar org.springframework.ai.model.deepseek.autoconfigure.DeepSeekChatAutoConfiguration)",
+      "Bash(javap -verbose -classpath /Users/dehualiu/.m2/repository/org/springframework/ai/spring-ai-autoconfigure-model-deepseek/1.1.5/spring-ai-autoconfigure-model-deepseek-1.1.5.jar org.springframework.ai.model.deepseek.autoconfigure.DeepSeekChatAutoConfiguration)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.4.0/embabel-agent-api-0.4.0.jar com.embabel.agent.api.models.OpenAiModels)",
+      "Bash(javap -classpath . com.embabel.agent.autoconfigure.models.deepseek.AgentDeepSeekAutoConfiguration)",
+      "Bash(mvn dependency:resolve -DincludeGroupIds=com.embabel.agent -DremoteRepositories=https://repo.maven.apache.org/maven2)",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/com/embabel/agent/embabel-agent-starter-deepseek/maven-metadata.xml\")",
+      "Bash(javap -c -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-deepseek-autoconfigure/0.3.5/embabel-agent-deepseek-autoconfigure-0.3.5.jar com.embabel.agent.autoconfigure.models.deepseek.AgentDeepSeekAutoConfiguration)"
     ],
     "additionalDirectories": [
       "/Users/dehualiu/.claude/projects/-Users-dehualiu-Documents-project-aiproject-embabel-book"

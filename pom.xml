@@ -48,21 +48,14 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- DeepSeek API (使用 OpenAI 兼容接口) -->
-        <dependency>
-            <groupId>com.theokanning.openai-gpt3-java</groupId>
-            <artifactId>service</artifactId>
-            <version>0.18.2</version>
-        </dependency>
-
-        <!-- Embabel Agent 框架 -->
+        <!-- Embabel Agent 框架（含 DeepSeek 支持） -->
         <dependency>
             <groupId>com.embabel.agent</groupId>
-            <artifactId>embabel-agent-starter</artifactId>
-            <version>0.4.0</version>
+            <artifactId>embabel-agent-starter-deepseek</artifactId>
+            <version>0.3.5</version>
         </dependency>
 
-<!-- Test -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

@@ -40,7 +40,7 @@ import java.util.List;
 @Agent(
         name = "LibraryAgent",
         description = "智能图书借阅 Agent — 通过自然语言完成图书借阅",
-        version = "1.0"
+        version = "1.0.0"
 )
 public class LibraryAgent {
 
