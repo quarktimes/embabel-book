@@ -74,7 +74,10 @@
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.AgentPlatform)",
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.AgentProcess)",
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-platform-autoconfigure/0.3.5/embabel-agent-platform-autoconfigure-0.3.5.jar com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration)",
-      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.ProcessOptions)"
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.ProcessOptions)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar 'com.embabel.agent.core.ProcessOptions$Companion')",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.Blackboard)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar 'com.embabel.agent.core.Blackboard')"
     ],
     "additionalDirectories": [
       "/Users/dehualiu/.claude/projects/-Users-dehualiu-Documents-project-aiproject-embabel-book"

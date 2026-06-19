@@ -48,6 +48,22 @@ public class LibraryService {
     }
 
     public String borrowBook(String userId, String query) {
-        return agent.execute(new BorrowRequest(userId, query));
+        try {
+            var result = agent.execute(new BorrowRequest(userId, query));
+            return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
+        } catch (IllegalArgumentException e) {
+            return switch (e.getMessage()) {
+                case "empty_query" -> "请描述您想借什么样的书，比如「我想借科幻小说」";
+                case "user_not_found" -> "用户不存在";
+                default -> "抱歉，请求有误";
+            };
+        } catch (IllegalStateException e) {
+            return switch (e.getMessage()) {
+                case "no_books_found" -> "抱歉，没有找到符合的图书";
+                case "all_borrowed" -> "找到的图书目前都已被借出";
+                case "all_borrowed_before" -> "这些书您都已经借过了";
+                default -> "抱歉，暂时无法借阅";
+            };
+        }
     }
 }

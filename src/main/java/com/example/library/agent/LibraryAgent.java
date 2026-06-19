@@ -133,39 +133,32 @@ public class LibraryAgent {
     }
 
     // ════════════════════════════════════════════
-    // 手动编排 — 平台完全就绪后可移除
+    // 公共入口 — 供 LibraryService 调用
     // ════════════════════════════════════════════
 
-    public String execute(BorrowRequest request) {
+    public BorrowResult execute(BorrowRequest request) {
         log.info("=== OODA Loop ===");
 
         if (!hasValidQuery(request))
-            return "请描述您想借什么样的书，比如「我想借科幻小说」";
+            throw new IllegalArgumentException("empty_query");
 
         var parsed = parseQuery(request);
         var allBooks = searchBooks(parsed);
         if (!hasBooks(allBooks))
-            return "抱歉，没有找到" + describe(parsed) + "的图书";
+            throw new IllegalStateException("no_books_found");
 
         var available = checkAvailable(allBooks);
         if (!hasBooks(available))
-            return "找到的图书目前都已被借出";
+            throw new IllegalStateException("all_borrowed");
 
         var user = userRepository.findById(request.userId()).map(e -> e.toDomain()).orElse(null);
-        if (user == null) return "用户不存在";
+        if (user == null)
+            throw new IllegalArgumentException("user_not_found");
 
         var candidates = filterBorrowed(available, user);
         if (!hasBooks(candidates))
-            return "这些书您都已经借过了";
+            throw new IllegalStateException("all_borrowed_before");
 
-        var result = borrowBook(candidates.getFirst(), user);
-        return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
-    }
-
-    private String describe(ParsedQuery q) {
-        if (q.category() != null) return q.category() + "类";
-        if (q.author() != null) return q.author() + "的作品";
-        if (q.keyword() != null) return "关于「" + q.keyword() + "」";
-        return "";
+        return borrowBook(candidates.getFirst(), user);
     }
 }
