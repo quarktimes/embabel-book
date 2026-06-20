@@ -127,9 +127,4 @@ public class LibraryAgent {
         return request != null && request.query() != null && !request.query().isBlank();
     }
 
-    @Condition(name = "hasBooks", cost = 0)
-    public boolean hasBooks(List<Book> books) {
-        return books != null && !books.isEmpty();
-    }
-
 }

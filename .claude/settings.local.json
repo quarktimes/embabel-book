@@ -89,7 +89,9 @@
       "Read(//Users/dehualiu/.m2/repository/com/embabel/**)",
       "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar 'com.embabel.agent.core.MayHaveLastResult')",
       "Bash(mvn compile *)",
-      "Bash(javap -c /Users/dehualiu/Documents/project/aiproject/embabel-weather/target/classes/com/embabel/weather/service/WeatherService.class)"
+      "Bash(javap -c /Users/dehualiu/Documents/project/aiproject/embabel-weather/target/classes/com/embabel/weather/service/WeatherService.class)",
+      "Bash(javap -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.support.InMemoryBlackboard)",
+      "Bash(javap -c -classpath /Users/dehualiu/.m2/repository/com/embabel/agent/embabel-agent-api/0.3.5/embabel-agent-api-0.3.5.jar com.embabel.agent.core.support.InMemoryBlackboard)"
     ],
     "additionalDirectories": [
       "/Users/dehualiu/.claude/projects/-Users-dehualiu-Documents-project-aiproject-embabel-book"
