@@ -91,7 +91,7 @@ public class LibraryAgent {
     @AchievesGoal(description = "用户成功借到图书", value = 1.0)
     public BorrowResult borrowBook(List<Book> books, BorrowRequest request) {
         log.info("action=borrowBook input={} books", books.size());
-        if (!hasBooks(books))
+        if (books == null || books.isEmpty())
             throw new IllegalStateException("no_books_found");
 
         var user = userRepository.findById(request.userId())

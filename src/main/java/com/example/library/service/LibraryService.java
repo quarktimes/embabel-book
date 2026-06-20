@@ -78,7 +78,7 @@ public class LibraryService {
                 return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
             }
 
-            // 执行完毕但没有结果 → Condition 拦截
+            // 执行完毕但没有结果 → GOAP 规划器未能完成（Condition 不满足）
             return "请描述您想借什么样的书，比如「我想借科幻小说」";
 
         } catch (java.util.concurrent.ExecutionException e) {
