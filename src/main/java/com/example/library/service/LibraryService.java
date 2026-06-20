@@ -3,7 +3,6 @@ package com.example.library.service;
 import com.embabel.agent.core.Agent;
 import com.embabel.agent.core.AgentPlatform;
 import com.embabel.agent.core.ProcessOptions;
-import com.example.library.agent.LibraryAgent;
 import com.example.library.domain.Book;
 import com.example.library.domain.BorrowRequest;
 import com.example.library.domain.BorrowResult;
@@ -22,10 +21,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 图书借阅的视图层服务。
- * <p>
- * 主线：通过 AgentPlatform 执行 GOAP agent，引擎自主编排 Action 链。
- * 降级：Agent 异常时直调 execute()。
+ * 图书借阅视图服务。
+ * 通过 AgentPlatform 执行 Embabel GOAP 规划器自动编排 Action 链。
+ * 失败时根据异常码返回对应中文提示。
  */
 @Service
 public class LibraryService {
@@ -34,9 +32,6 @@ public class LibraryService {
 
     @Autowired
     private AgentPlatform agentPlatform;
-
-    @Autowired
-    private LibraryAgent agent;
 
     @Autowired
     private BookRepository bookRepository;
@@ -62,47 +57,53 @@ public class LibraryService {
     }
 
     public String borrowBook(String userId, String query) {
-        // ── 主线：通过 GOAP 引擎执行 Agent ──
-        try {
-            Agent platformAgent = agentPlatform.agents().stream()
-                    .filter(a -> "LibraryAgent".equals(a.getName()))
-                    .findFirst()
-                    .orElse(null);
-
-            if (platformAgent != null) {
-                var request = new BorrowRequest(userId, query);
-                var process = agentPlatform.createAgentProcessFrom(
-                        platformAgent, ProcessOptions.DEFAULT, request);
-                CompletableFuture<?> future = agentPlatform.start(process);
-                future.get();
-
-                // 从黑板提取借书结果
-                BorrowResult result = process.resultOfType(BorrowResult.class);
-                if (result != null) {
-                    return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
-                }
-            }
-        } catch (Exception e) {
-            log.warn("AgentPlatform execution failed, falling back to execute(): {}", e.getMessage());
+        // 输入校验 — 无需 GOAP
+        if (query == null || query.isBlank()) {
+            return "请描述您想借什么样的书，比如「我想借科幻小说」";
         }
 
-        // ── 降级：手动编排 ──
         try {
-            var result = agent.execute(new BorrowRequest(userId, query));
-            return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
-        } catch (IllegalArgumentException e) {
-            return switch (e.getMessage()) {
-                case "empty_query" -> "请描述您想借什么样的书，比如「我想借科幻小说」";
+            var agent = agentPlatform.agents().stream()
+                    .filter(a -> "LibraryAgent".equals(a.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("LibraryAgent not found"));
+
+            var process = agentPlatform.createAgentProcessFrom(
+                    agent, ProcessOptions.DEFAULT, new BorrowRequest(userId, query));
+            CompletableFuture<?> future = agentPlatform.start(process);
+            future.get();
+
+            BorrowResult result = process.resultOfType(BorrowResult.class);
+            if (result != null) {
+                return "成功借阅《" + result.book().title() + "》(" + result.book().author() + ")";
+            }
+
+            // 执行完毕但没有结果 → Condition 拦截
+            return "请描述您想借什么样的书，比如「我想借科幻小说」";
+
+        } catch (java.util.concurrent.ExecutionException e) {
+            return handleError(e.getCause());
+        } catch (Exception e) {
+            return handleError(e);
+        }
+    }
+
+    private String handleError(Throwable t) {
+        if (t instanceof IllegalArgumentException ia) {
+            return switch (ia.getMessage()) {
                 case "user_not_found" -> "用户不存在";
                 default -> "抱歉，请求有误";
             };
-        } catch (IllegalStateException e) {
-            return switch (e.getMessage()) {
+        }
+        if (t instanceof IllegalStateException is) {
+            return switch (is.getMessage()) {
                 case "no_books_found" -> "抱歉，没有找到符合的图书";
                 case "all_borrowed" -> "找到的图书目前都已被借出";
                 case "all_borrowed_before" -> "这些书您都已经借过了";
                 default -> "抱歉，暂时无法借阅";
             };
         }
+        log.error("unexpected error: {}", t.getMessage(), t);
+        return "抱歉，借书服务异常";
     }
 }

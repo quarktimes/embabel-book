@@ -86,40 +86,35 @@ public class LibraryAgent {
         return List.of();
     }
 
-    @Action(cost = 0, description = "实时检查图书可借状态")
-    public List<Book> checkAvailable(List<Book> books) {
-        log.info("action=checkAvailable input={}", books.size());
-        return books.stream()
-                .filter(b -> bookRepository.findById(b.id()).map(e -> e.isAvailable()).orElse(false))
-                .toList();
-    }
-
     @Transactional
-    @Action(cost = 1, description = "过滤已借并执行借书")
+    @Action(cost = 1, description = "检查可借、过滤已借、执行借书")
     @AchievesGoal(description = "用户成功借到图书", value = 1.0)
     public BorrowResult borrowBook(List<Book> books, BorrowRequest request) {
-        // 加载用户
+        log.info("action=borrowBook input={} books", books.size());
+        if (!hasBooks(books))
+            throw new IllegalStateException("no_books_found");
+
         var user = userRepository.findById(request.userId())
                 .map(e -> e.toDomain())
                 .orElseThrow(() -> new IllegalArgumentException("user_not_found"));
-        // 过滤已借
+
+        // 实时检查可借 + 过滤已借
         var candidates = books.stream()
+                .filter(b -> bookRepository.findById(b.id())
+                        .map(e -> e.isAvailable()).orElse(false))
                 .filter(b -> !user.borrowedBookIds().contains(b.id()))
                 .toList();
+
         if (candidates.isEmpty())
-            throw new IllegalStateException("all_borrowed_before");
-        // 选第一本
-        var book = candidates.getFirst();
-        log.info("action=borrowBook book={} user={}", book.id(), user.id());
-        var bookEntity = bookRepository.findById(book.id())
-                .orElseThrow(() -> new IllegalArgumentException("图书不存在: " + book.id()));
-        if (!bookEntity.isAvailable())
             throw new IllegalStateException("all_borrowed");
-        bookEntity.setAvailable(false);
-        bookRepository.save(bookEntity);
+
+        var book = candidates.getFirst();
+        bookRepository.findById(book.id()).ifPresent(e -> e.setAvailable(false));
+        bookRepository.flush();
         borrowRecordRepository.save(new BorrowRecordEntity(
                 userRepository.findById(user.id()).orElseThrow(),
-                bookEntity, LocalDateTime.now()));
+                bookRepository.findById(book.id()).orElseThrow(),
+                LocalDateTime.now()));
         return new BorrowResult(true, "成功借阅《" + book.title() + "》(" + book.author() + ")", book);
     }
 
@@ -137,25 +132,4 @@ public class LibraryAgent {
         return books != null && !books.isEmpty();
     }
 
-    // ════════════════════════════════════════════
-    // 公共入口 — 供 LibraryService 调用
-    // ════════════════════════════════════════════
-
-    public BorrowResult execute(BorrowRequest request) {
-        log.info("=== OODA Loop ===");
-
-        if (!hasValidQuery(request))
-            throw new IllegalArgumentException("empty_query");
-
-        var parsed = parseQuery(request);
-        var allBooks = searchBooks(parsed);
-        if (!hasBooks(allBooks))
-            throw new IllegalStateException("no_books_found");
-
-        var available = checkAvailable(allBooks);
-        if (!hasBooks(available))
-            throw new IllegalStateException("all_borrowed");
-
-        return borrowBook(available, request);
-    }
 }
